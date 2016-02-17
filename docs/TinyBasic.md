@@ -8,7 +8,7 @@ form. Hopefully, you are familiar with it. `CR` stands for carriage return,
 <kbd>Enter</kbd>.
 
 ```
-   line ::= number statement CR | statement CR
+   line ::= statement CR
 
    statement ::= PRINT expr-list
                  IF expression relop expression THEN statement
