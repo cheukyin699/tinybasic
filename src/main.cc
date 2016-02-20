@@ -5,6 +5,8 @@
 
 #define VERSION         "v0.0.0"
 
+const string Prompt = ">> ";
+
 int main(/*int argc, char* argv[]*/) {
     Editor ed;
     string line;
@@ -12,7 +14,7 @@ int main(/*int argc, char* argv[]*/) {
     cout << "tbasic line editor " VERSION << endl;
     while (ed.isRunning()) {
         // Command prompt
-        cout << ">> ";
+        cout << Prompt;
         getline(cin, line);
         ed.handleInput(line);
     }

@@ -39,44 +39,17 @@ void Editor::handleInput(string line) {
     switch (cmd_char) {
         case 'Q': running = false; return;  // Q for quit
         case 'U':                           // Navigate up 1 line
-            if (curr_line == 0) {
-                cout << "At top of file already" << endl;
-                return;
-            }
-            curr_line = clamp<unsigned>(0, buffer.size(), curr_line - cmd_num);
-            printLine(curr_line);
+            navLine(-cmd_num);
             return;
         case 'D':                           // Navigate down 1 line
-            if (curr_line == buffer.size() - 1) {
-                cout << "At bottom of file already" << endl;
-                return;
-            }
-            curr_line = clamp<unsigned>(0, buffer.size(), curr_line + cmd_num);
-            printLine(curr_line);
+            navLine(cmd_num);
             return;
         case 'I':                           // Insert this line
-        {
-            // Skip all the spaces
-            unsigned ind = nextToken(line, 1);
-            // Automagically converts to ALL CAPS
-            transform(line.begin(), line.end(), line.begin(), ::toupper);
-            // Insert the line into buffer, AFTER the current line
-            // It also increments the line counter
-            // If the buffer is empty, it merely pushes it back
-            if (buffer.size() == 0 || curr_line == buffer.size()) {
-                buffer.push_back(line.substr(ind));
-                curr_line++;
-            }
-            else
-                buffer.insert(buffer.begin() + ++curr_line, line.substr(ind));
+            insertLine(line);
             return;
-        }
         case 'R':                           // Remove (some) lines
-        {
-            unsigned erase_count = clamp<unsigned>(0, buffer.size(), curr_line + cmd_num);
-            buffer.erase(buffer.begin() + curr_line, buffer.begin() + erase_count);
+            removeLine(cmd_num);
             return;
-        }
         case 'S':                           // Show all lines
             for (unsigned i = 0; i < buffer.size(); i++)
                 printLine(i);
@@ -91,94 +64,19 @@ void Editor::handleInput(string line) {
             curr_line = buffer.size() - 1;
             return;
         case 'W':                           // Write to file
-        {
-            // Get filename, if any
-            unsigned ind = nextToken(line, 1);
-            string fn = line.substr(ind);
-            if (fn.empty()) {
-                if (filename.empty()) {
-                    cout << "error: must specify filename" << endl;
-                    return;
-                }
-                fn = filename;
-            }
-            ofstream f(fn, ios::out);
-
-            if (f.good()) {
-                unsigned lines = 0;
-                for (auto l: buffer) {
-                    f << l << endl;
-                    lines++;
-                }
-                cout << lines << " lines written successfully to '" << fn << "'" << endl;
-            } else {
-                cout << "Couldn't open file '" << fn << "' for writing" << endl;
-            }
-
-            f.close();
-
+            write(line);
             return;
-        }
         case 'L':                           // Load from file
-        {
-            // Get filename, if any
-            unsigned ind = nextToken(line, 1);
-            string fn = line.substr(ind);
-            if (fn.empty()) {
-                if (filename.empty()) {
-                    cout << "error: must specify filename" << endl;
-                    return;
-                }
-                fn = filename;
-            }
-            ifstream f(fn, ios::in);
-
-            if (f.good()) {
-                // Clear the buffer first
-                buffer.clear();
-                filename = fn;
-                string l = "";
-                unsigned lines = 0;
-                while(getline(f, l)) {
-                    buffer.push_back(l);
-                    lines++;
-                }
-
-                cout << lines << " lines read successfully from '" << fn << "'" << endl;
-            } else {
-                cout << "Couldn't open file '" << fn << "' for reading" << endl;
-            }
-
-            f.close();
-
+            load(line);
             return;
-        }
         case 'X':                           // Execute the program
-        {
-            // TODO fill this in once done testing
-            unsigned errs = 0, i = 0;
-            for (auto l: buffer) {
-                i++;
-                try {
-                    auto tokens = get_tokens(l);
-                    #ifdef DEBUG
-                    for (auto t: tokens)
-                        cout << t << endl;
-                    #endif
-                } catch (runtime_error ex) {
-                    cerr << "Line " << i << ":" << ex.what() << endl;
-                    errs++;
-                }
-            }
-            cout << "Total of " << errs << " error(s) reported.\n";
+            execute();
             return;
-        }
         case 'H':                           // Output help screen
+            help();
             return;
         case '?':                           // Output file statistics
-            cout << "Filename: " << (filename.empty()? "<untitled>": filename) << endl
-                << "Current line: " << curr_line << endl
-                << "Total lines: " << buffer.size() << endl;
+            fileStats();
             return;
         default:                            // Report an error
             printf("Couldn't recognize command '%c'\n", cmd_char);
@@ -188,4 +86,131 @@ void Editor::handleInput(string line) {
 
 void Editor::printLine(unsigned i) {
     printf("%04u %s\n", i, buffer[i].c_str());
+}
+
+void Editor::navLine(int lines) {
+    if (lines < 0 && curr_line == 0) {
+        // Specific to navigating upwards
+        cout << "At top of file already" << endl;
+        return;
+    } else if (lines > 0 && curr_line == buffer.size() - 1) {
+        // Specific to navigating downwards
+        cout << "At bottom of file already" << endl;
+        return;
+    }
+    curr_line = clamp<unsigned>(0, buffer.size(), curr_line + lines);
+    printLine(curr_line);
+}
+
+void Editor::insertLine(string line) {
+    // Skip all the spaces
+    unsigned ind = nextToken(line, 1);
+    // Automagically converts to ALL CAPS
+    transform(line.begin(), line.end(), line.begin(), ::toupper);
+    // Insert the line into buffer, AFTER the current line
+    // It also increments the line counter
+    // If the buffer is empty, it merely pushes it back
+    if (buffer.size() == 0 || curr_line == buffer.size()) {
+        buffer.push_back(line.substr(ind));
+        curr_line++;
+    }
+    else
+        buffer.insert(buffer.begin() + ++curr_line, line.substr(ind));
+}
+
+void Editor::removeLine(unsigned times) {
+    unsigned erase_count = clamp<unsigned>(0, buffer.size(), curr_line + times);
+    buffer.erase(buffer.begin() + curr_line, buffer.begin() + erase_count);
+}
+
+void Editor::write(string line) {
+    // Get filename, if any
+    unsigned ind = nextToken(line, 1);
+    string fn = line.substr(ind);
+    if (fn.empty()) {
+        if (filename.empty()) {
+            cout << "error: must specify filename" << endl;
+            return;
+        }
+        fn = filename;
+    }
+    ofstream f(fn, ios::out);
+
+    if (f.good()) {
+        unsigned lines = 0;
+        for (auto l: buffer) {
+            f << l << endl;
+            lines++;
+        }
+        cout << lines << " lines written successfully to '" << fn << "'" << endl;
+    } else {
+        cout << "Couldn't open file '" << fn << "' for writing" << endl;
+    }
+
+    f.close();
+
+    return;
+}
+
+void Editor::load(string line) {
+    // Get filename, if any
+    unsigned ind = nextToken(line, 1);
+    string fn = line.substr(ind);
+    if (fn.empty()) {
+        if (filename.empty()) {
+            cout << "error: must specify filename" << endl;
+            return;
+        }
+        fn = filename;
+    }
+    ifstream f(fn, ios::in);
+
+    if (f.good()) {
+        // Clear the buffer first
+        buffer.clear();
+        filename = fn;
+        string l = "";
+        unsigned lines = 0;
+        while(getline(f, l)) {
+            buffer.push_back(l);
+            lines++;
+        }
+
+        cout << lines << " lines read successfully from '" << fn << "'" << endl;
+    } else {
+        cout << "Couldn't open file '" << fn << "' for reading" << endl;
+    }
+
+    f.close();
+}
+
+void Editor::execute() {
+    // TODO fill this in once done testing
+
+    // Tokenizer
+    unsigned errs = 0, i = 0;
+    for (auto l: buffer) {
+        i++;
+        try {
+            auto tokens = get_tokens(l);
+            #ifdef DEBUG
+            for (auto t: tokens)
+                cout << t << endl;
+            #endif
+        } catch (runtime_error ex) {
+            cerr << "Line " << i << ":" << ex.what() << endl;
+            errs++;
+        }
+    }
+    cout << "Total of " << errs << " error(s) reported.\n";
+}
+
+void Editor::fileStats() {
+    cout << "Filename: " << (filename.empty()? "<untitled>": filename) << endl
+        << "Current line: " << curr_line << endl
+        << "Total lines: " << buffer.size() << endl;
+}
+
+void Editor::help() {
+    // TODO
 }

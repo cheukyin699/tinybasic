@@ -15,11 +15,19 @@ class Editor {
         bool running;
 
         void printLine(unsigned);
+        void navLine(int);
+        void insertLine(string);
+        void removeLine(unsigned);
+        void fileStats();
 
     public:
         Editor();
 
         void handleInput(string);
+        void write(string);
+        void load(string);
+        void execute();
+        void help();
 
         bool isRunning() {return running;};
 
