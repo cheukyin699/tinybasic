@@ -1,8 +1,12 @@
 #ifndef TOKENIZER_H
 #define TOKENIZER_H
 
+#include <iostream>
+#include <map>
 #include <string>
 #include <vector>
+
+using namespace std;
 
 /* A representation of all the tokens
  */
@@ -26,11 +30,26 @@ struct token_t {
     string str;
 };
 
-// TODO
-token_t::token_t(Token tt=NONE, int n=0, string s="");
+token_t create_token(Token tt=NONE, int n=0, string s="");
 
 /* Get's a list of tokens from the line and returns them as a vector
  */
 vector<token_t> get_tokens(string line);
+
+/* Overrides << operator for token_t
+ */
+ostream& operator<<(ostream& os, token_t& t);
+
+
+
+/* This maps the corresponding strings to the corresponding Tokens
+ */
+const map<string, Token> token_map {
+    {"+", ADD}, {"-", SUB},  {"*", MUL}, {"/", DIV},
+    {"=", EQ}, {"<>", NEQ}, {"<", LT}, {">", GT}, {"<=", LTE}, {">=", GTE},
+    {"PRINT", PRINT}, {"IF", IF}, {"THEN", THEN}, {"GOTO", GOTO}, {"INPUT", INPUT},
+    {"LET", LET}, {"GOSUB", GOSUB}, {"RETURN", RETURN}, {"CLEAR", CLEAR},
+    {"LIST", LIST}, {"RUN", RUN}, {"END", END}
+};
 
 #endif

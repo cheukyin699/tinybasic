@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "editor.h"
+#include "tokenizer.h"
 #include "utilities.h"
 
 Editor::Editor() {
@@ -59,8 +60,9 @@ void Editor::handleInput(string line) {
             // Insert the line into buffer, AFTER the current line
             // It also increments the line counter
             // If the buffer is empty, it merely pushes it back
-            if (buffer.size() == 0)
+            if (buffer.size() == 0 || curr_line == buffer.size()) {
                 buffer.push_back(line.substr(ind));
+            }
             else
                 buffer.insert(buffer.begin() + ++curr_line, line.substr(ind));
             return;
@@ -148,7 +150,22 @@ void Editor::handleInput(string line) {
             return;
         }
         case 'X':                           // Execute the program
+        {
+            // TODO fill this in once done testing
+            unsigned errs = 0, i = 0;
+            for (auto l: buffer) {
+                i++;
+                try {
+                    auto tokens = get_tokens(l);
+                } catch (runtime_error ex) {
+                    cerr << "Line " << i << ": " << ex.what() << endl;
+                    errs++;
+                }
+            }
+
+            cout << "Total of " << errs << " error(s) reported.\n";
             return;
+        }
         case 'H':                           // Output help screen
             return;
         case '?':                           // Output file statistics

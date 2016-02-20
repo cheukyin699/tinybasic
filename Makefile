@@ -4,7 +4,7 @@ LD := g++
 LDFLAGS := 
 
 EXE := tbasic
-OBJ = obj/editor.o obj/main.o obj/utilities.o
+OBJ = obj/editor.o obj/main.o obj/utilities.o obj/tokenizer.o
 
 .PHONY: all clean
 
@@ -30,4 +30,7 @@ obj/main.o: src/main.cc
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 obj/utilities.o: src/utilities.cc src/utilities.h
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+obj/tokenizer.o: src/tokenizer.cc src/tokenizer.h
 	$(CXX) $(CXXFLAGS) $< -o $@
