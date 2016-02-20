@@ -15,8 +15,10 @@ enum Token {
     NONE,
     // Constants
     NUMBER, STRING,
+    // Variable(s)
+    VARIABLE,
     // Binary operators
-    ADD, SUB, MUL, DIV, EQ, NEQ, LT, GT, LTE, GTE,
+    ADD, SUB, MUL, DIV, EQ, NEQ, LT, GT, LTE, GTE, COMMA,
     // Reserved Keywords
     PRINT, IF, THEN, GOTO, INPUT, LET, GOSUB, RETURN, CLEAR, LIST, RUN, END
 };
@@ -26,7 +28,7 @@ enum Token {
  */
 struct token_t {
     Token t;
-    int num;
+    int num;        // The type of variable is stored here [0,25]
     string str;
 };
 
@@ -49,7 +51,7 @@ const map<string, Token> token_map {
     {"=", EQ}, {"<>", NEQ}, {"<", LT}, {">", GT}, {"<=", LTE}, {">=", GTE},
     {"PRINT", PRINT}, {"IF", IF}, {"THEN", THEN}, {"GOTO", GOTO}, {"INPUT", INPUT},
     {"LET", LET}, {"GOSUB", GOSUB}, {"RETURN", RETURN}, {"CLEAR", CLEAR},
-    {"LIST", LIST}, {"RUN", RUN}, {"END", END}
+    {"LIST", LIST}, {"RUN", RUN}, {"END", END}, {",", COMMA}
 };
 
 #endif

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cctype>
 #include <cstdio>
 #include <fstream>
@@ -57,11 +58,14 @@ void Editor::handleInput(string line) {
         {
             // Skip all the spaces
             unsigned ind = nextToken(line, 1);
+            // Automagically converts to ALL CAPS
+            transform(line.begin(), line.end(), line.begin(), ::toupper);
             // Insert the line into buffer, AFTER the current line
             // It also increments the line counter
             // If the buffer is empty, it merely pushes it back
             if (buffer.size() == 0 || curr_line == buffer.size()) {
                 buffer.push_back(line.substr(ind));
+                curr_line++;
             }
             else
                 buffer.insert(buffer.begin() + ++curr_line, line.substr(ind));
@@ -157,12 +161,15 @@ void Editor::handleInput(string line) {
                 i++;
                 try {
                     auto tokens = get_tokens(l);
+                    #ifdef DEBUG
+                    for (auto t: tokens)
+                        cout << t << endl;
+                    #endif
                 } catch (runtime_error ex) {
-                    cerr << "Line " << i << ": " << ex.what() << endl;
+                    cerr << "Line " << i << ":" << ex.what() << endl;
                     errs++;
                 }
             }
-
             cout << "Total of " << errs << " error(s) reported.\n";
             return;
         }

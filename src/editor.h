@@ -1,5 +1,6 @@
 #ifndef EDITOR_H
 #define EDITOR_H
+#define DEBUG
 
 #include <string>
 #include <vector>
