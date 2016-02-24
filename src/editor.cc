@@ -89,11 +89,11 @@ void Editor::printLine(unsigned i) {
 }
 
 void Editor::navLine(int lines) {
-    if (lines < 0 && curr_line == 0) {
+    if (lines < 0 && curr_line <= 0) {
         // Specific to navigating upwards
         cout << "At top of file already" << endl;
         return;
-    } else if (lines > 0 && curr_line == buffer.size() - 1) {
+    } else if (lines > 0 && curr_line >= buffer.size() - 1) {
         // Specific to navigating downwards
         cout << "At bottom of file already" << endl;
         return;

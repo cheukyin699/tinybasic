@@ -33,10 +33,16 @@ struct token_t {
 };
 
 token_t create_token(Token tt=NONE, int n=0, string s="");
+void reset_token(token_t&);
 
 /* Get's a list of tokens from the line and returns them as a vector
  */
 vector<token_t> get_tokens(string line);
+
+/* Checks to see if the given string is a token. If it is, it returns that
+ * token. If it isn't, it returns a token with NONE as the type.
+ */
+void is_token(string, token_t&);
 
 /* Overrides << operator for token_t
  */
