@@ -6,7 +6,6 @@
 #include <stdexcept>
 
 #include "editor.h"
-#include "tokenizer.h"
 #include "utilities.h"
 
 Editor::Editor() {
@@ -47,6 +46,9 @@ void Editor::handleInput(string line) {
             return;
         case 'I':                           // Insert this line
             insertLine(line);
+            return;
+        case 'E':                           // Edits this line (replaces it)
+            editLine(line);
             return;
         case 'R':                           // Remove (some) lines
             removeLine(cmd_num);
@@ -186,10 +188,9 @@ void Editor::load(string line) {
 }
 
 void Editor::execute() {
-    // TODO fill this in once done testing
-
     // Tokenizer
     unsigned errs = 0, i = 0;
+    vector<v_tokens> t_buff;
     for (auto l: buffer) {
         i++;
         try {
@@ -198,6 +199,7 @@ void Editor::execute() {
             for (auto t: tokens)
                 cout << t << endl;
             #endif
+            t_buff.push_back(tokens);
         } catch (runtime_error ex) {
             cerr << "Line " << i << ":" << ex.what() << endl;
             errs++;
@@ -214,4 +216,12 @@ void Editor::fileStats() {
 
 void Editor::help() {
     // TODO
+}
+
+void Editor::editLine(string line) {
+    try {
+        buffer.at(curr_line) = line;
+    } catch (exception ex) {
+        buffer.insert(buffer.begin() + curr_line, line);
+    }
 }

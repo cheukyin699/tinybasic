@@ -21,8 +21,8 @@ void reset_token(token_t& t) {
     t.str = "";
 }
 
-vector<token_t> get_tokens(string line) {
-    vector<token_t> tokens;
+v_tokens get_tokens(string line) {
+    v_tokens tokens;
 
     // Initial indexing
     for (unsigned i = 0; i < line.size(); i++) {

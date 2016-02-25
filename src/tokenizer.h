@@ -32,12 +32,19 @@ struct token_t {
     string str;
 };
 
+typedef vector<token_t> v_tokens;
+
+/* Creates a new token from scratch
+ */
 token_t create_token(Token tt=NONE, int n=0, string s="");
+
+/* Creates a new token with the defaults from one that has just been initialized
+ */
 void reset_token(token_t&);
 
 /* Get's a list of tokens from the line and returns them as a vector
  */
-vector<token_t> get_tokens(string line);
+v_tokens get_tokens(string line);
 
 /* Checks to see if the given string is a token. If it is, it returns that
  * token. If it isn't, it returns a token with NONE as the type.
