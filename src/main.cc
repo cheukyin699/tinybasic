@@ -11,7 +11,7 @@ int main(/*int argc, char* argv[]*/) {
     Editor ed;
     string line;
 
-    cout << "tbasic line editor " VERSION << endl;
+    cout << "tbasic line editor " VERSION "\n";
     while (ed.isRunning()) {
         // Command prompt
         cout << Prompt;
