@@ -227,4 +227,5 @@ void Editor::editLine(string line) {
     } catch (exception ex) {
         buffer.insert(buffer.begin() + curr_line, line);
     }
+    curr_line++;
 }
