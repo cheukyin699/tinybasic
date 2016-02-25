@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <exception>
+#include <stdexcept>
 
 #include "tokenizer.h"
 
