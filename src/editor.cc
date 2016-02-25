@@ -215,7 +215,10 @@ void Editor::fileStats() {
 }
 
 void Editor::help() {
-    // TODO
+    cout << "Up/Down, Insert/Edit/Remove, Show_all/Current_line, Top/Bottom,\n"
+        << "Write/Load, eXecute, Help, file_stats?\n"
+        << "For more specifics on how to use these commands, I STRONGLY URGE YOU\n"
+        << "TO READ THE DOCUMENTATION IN docs/ DIRECTORY\n";
 }
 
 void Editor::editLine(string line) {
