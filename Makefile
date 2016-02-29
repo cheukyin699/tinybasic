@@ -5,13 +5,18 @@ LDFLAGS :=
 
 EXE := tbasic
 OBJ = obj/editor.o obj/main.o obj/utilities.o obj/tokenizer.o
+TESTS := test_tokenizer
 
-.PHONY: all clean
+.PHONY: all clean tests
 
 all: $(EXE)
 
 clean:
-	rm -f $(OBJ) $(EXE)
+	rm -f $(OBJ)
+	rm -f $(EXE)
+	rm -f $(TESTS)
+
+tests: $(TESTS)
 
 $(EXE): obj/ $(OBJ)
 	$(LD) $(LDFLAGS) $(OBJ) -o $@
@@ -34,3 +39,11 @@ obj/utilities.o: src/utilities.cc src/utilities.h
 
 obj/tokenizer.o: src/tokenizer.cc src/tokenizer.h
 	$(CXX) $(CXXFLAGS) $< -o $@
+
+
+# Building tests and stuff
+obj/tokenizer01.o: tests/tokenizer01.cc src/tokenizer.h
+	$(CXX) $(CXXFLAGS) $< -Isrc/ -o $@
+
+test_tokenizer: obj/tokenizer01.o obj/tokenizer.o
+	$(LD) $(LDFLAGS) $^ -o $@
