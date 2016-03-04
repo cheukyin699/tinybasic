@@ -12,12 +12,12 @@ int main(/*int argc, char* argv[]*/) {
     string line;
 
     cout << "tbasic line editor " VERSION "\n";
-    while (ed.isRunning()) {
+    do {
         // Command prompt
         cout << Prompt;
         getline(cin, line);
         ed.handleInput(line);
-    }
+    } while (ed.isRunning());
 
     return 0;
 }
