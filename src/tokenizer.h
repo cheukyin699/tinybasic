@@ -47,9 +47,10 @@ void reset_token(token_t&);
 v_tokens get_tokens(string line);
 
 /* Checks to see if the given string is a token. If it is, it returns that
- * token. If it isn't, it returns a token with NONE as the type.
+ * token. If it isn't, it gives a token with NONE as the type. It returns a
+ * the length of the token, or -1 if the whole length is used.
  */
-void is_token(string, token_t&);
+unsigned is_token(string, token_t&);
 
 /* Overrides << operator for token_t
  */

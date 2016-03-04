@@ -33,15 +33,14 @@ v_tokens get_tokens(string line) {
         token_t t;
         bool has_pushed = false;
         for (unsigned s = line.size()-i; s > 0; s--) {
-            // To save space, it doesn't return anything
-            is_token(line.substr(i, s), t);
+            unsigned size = is_token(line.substr(i, s), t);
 
             // If it didn't find anything, continue with a smaller size
             if (t.t == NONE)
                 continue;
             else {
                 tokens.push_back(t);
-                i += s - 1;
+                i += (size? size : s) - 1;
                 has_pushed = true;
                 break;
             }
@@ -56,7 +55,8 @@ v_tokens get_tokens(string line) {
     return tokens;
 }
 
-void is_token(string line, token_t& token) {
+unsigned is_token(string line, token_t& token) {
+    unsigned ret = 0;
     reset_token(token);
     // Checks to see if it is a variable (size 1)
     if (line.size() == 1 && isalpha(line[0])) {
@@ -66,10 +66,18 @@ void is_token(string line, token_t& token) {
     }
 
     // Checks if it is a string
-    else if (line[0] == '"' && line.find('"', 1) == line.size()-1) {
-        // If you can only find 1 other " in the string, and it's at the end
-        token.t = STRING;
-        token.str = line.substr(1, line.size()-2);
+    else if (line[0] == '"') {
+        unsigned quote = line.find('"', 1);
+        if (quote == line.size()-1) {
+            // If you can only find 1 other " in the string, and it's at the end
+            token.t = STRING;
+            token.str = line.substr(1, line.size()-2);
+        } else {
+            // If you have found other " in the string, change the stuff up...
+            token.t = STRING;
+            token.str = line.substr(1, quote-1);
+            ret = quote+1;
+        }
     }
 
     // Checks if it is a number
@@ -82,12 +90,26 @@ void is_token(string line, token_t& token) {
         token.num = stoi(line);
     }
 
+    // Checks if it is a number
+    else if (isdigit(line[0])) {
+        unsigned i;
+        for (i = 0; i < line.length() - 1; i++) {
+            if (!isdigit(line[i+1])) break;
+        }
+        ret = i + 1;
+        token.t = NUMBER;
+        token.str = line.substr(0, i + 1);
+        token.num = stoi(token.str);
+    }
+
     // Checks to see if it is a binary operator or keyword by looking up the
     // tokens
     else if (token_map.find(line) != token_map.end()) {
         token.t = token_map.at(line);
         token.str = line;
     }
+
+    return ret;
 }
 
 ostream& operator<<(ostream& os, token_t& t) {

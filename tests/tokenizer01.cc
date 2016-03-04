@@ -8,8 +8,9 @@
 using namespace std;
 
 const vector<string> Test_Strings = {
-    "PRINT \"Hello, World\"",
     "IF A<B THEN GOTO 1",
+    "PRINT 123+246 * 300",
+    "PRINT \"Hello, world\", \"Are you feeling it yet?\"",
 };
 
 int main() {
