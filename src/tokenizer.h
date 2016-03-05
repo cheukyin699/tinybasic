@@ -23,6 +23,9 @@ enum Token {
     PRINT, IF, THEN, GOTO, INPUT, LET, GOSUB, RETURN, CLEAR, LIST, RUN, END
 };
 
+// The longest keyword length
+const unsigned Longest_KW = 6;
+
 /* A representation of the token type, in which contains the type of the token,
  * as well as the value(s)
  */

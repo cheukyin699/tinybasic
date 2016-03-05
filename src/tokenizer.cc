@@ -36,8 +36,10 @@ v_tokens get_tokens(string line) {
             unsigned size = is_token(line.substr(i, s), t);
 
             // If it didn't find anything, continue with a smaller size
-            if (t.t == NONE)
-                continue;
+            if (t.t == NONE) {
+                // If you have already checked once, change size
+                if (s > Longest_KW) s = Longest_KW;
+            }
             else {
                 tokens.push_back(t);
                 i += (size? size : s) - 1;
