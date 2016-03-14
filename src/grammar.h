@@ -42,7 +42,7 @@ class StrExpr {
  */
 class Term {
 public:
-    vector<Factor> fs;
+    vector<Factor*> fs;
     vector<Token> tks;
 };
 
@@ -55,7 +55,7 @@ public:
  */
 class Expression: public StrExpr {
 public:
-    vector<Term> ts;
+    vector<Term*> ts;
     vector<Token> tks;
 };
 
@@ -75,7 +75,7 @@ public:
  */
 class ExprList {
 public:
-    vector<StrExpr> exprs;
+    vector<StrExpr*> exprs;
 };
 
 /* The Variable class.
@@ -108,7 +108,7 @@ public:
  */
 class VarList {
 public:
-    vector<Variable> vars;
+    vector<Variable*> vars;
 };
 
 /* The PrntStatement class.
