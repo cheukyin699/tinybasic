@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "editor.h"
+#include "parser.h"
 #include "utilities.h"
 
 Editor::Editor() {
@@ -194,12 +195,8 @@ void Editor::execute() {
     for (auto l: buffer) {
         i++;
         try {
-            auto tokens = get_tokens(l);
-            #ifdef DEBUG
-            for (auto t: tokens)
-                cout << t << endl;
-            #endif
-            t_buff.push_back(tokens);
+            Parser p(l);
+            p.generateTree();
         } catch (runtime_error ex) {
             cerr << "Line " << i << ":" << ex.what() << endl;
             errs++;
