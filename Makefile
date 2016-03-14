@@ -4,7 +4,7 @@ LD := g++
 LDFLAGS := 
 
 EXE := tbasic
-OBJ = obj/editor.o obj/main.o obj/utilities.o obj/tokenizer.o
+OBJ = obj/editor.o obj/main.o obj/utilities.o obj/tokenizer.o obj/parser.o
 TESTS := test_tokenizer
 
 .PHONY: all clean tests
@@ -28,18 +28,11 @@ obj/:
 
 # Source files and stuff
 
-obj/editor.o: src/editor.cc src/editor.h
+obj/%.o: src/%.cc src/%.h
 	$(CXX) $(CXXFLAGS) $< -o $@
 
-obj/main.o: src/main.cc
+obj/%.o: src/%.cc
 	$(CXX) $(CXXFLAGS) $< -o $@
-
-obj/utilities.o: src/utilities.cc src/utilities.h
-	$(CXX) $(CXXFLAGS) $< -o $@
-
-obj/tokenizer.o: src/tokenizer.cc src/tokenizer.h
-	$(CXX) $(CXXFLAGS) $< -o $@
-
 
 # Building tests and stuff
 obj/tokenizer01.o: tests/tokenizer01.cc src/tokenizer.h
