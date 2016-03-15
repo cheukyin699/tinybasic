@@ -217,10 +217,21 @@ void Editor::execute() {
         #ifdef DEBUG
         cout << "Total of " << errs << " error(s) reported.\n";
         #endif
+
+        inter.set(stmnts);
     }
 
     // Execute everything
-
+    if (!errs) {
+        try {
+            inter.run();
+        } catch (runtime_error ex) {
+            cerr << "error: " << ex.what() << endl;
+        }
+    }
+    else {
+        cerr << "cannot run program until all above errors are fixed!\n";
+    }
 
     changed = false;
 }

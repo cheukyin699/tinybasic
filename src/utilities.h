@@ -2,6 +2,7 @@
 #define UTILITIES_H
 
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -23,6 +24,18 @@ T clamp(T lo, T hi, T x) {
  * the size of the string if it can't find it.
  */
 unsigned nextToken(string, unsigned);
+
+/* The vector destructor takes a vector of pointers and iterates through each
+ * and every one of them, calling the pointer's destructor, then sets the
+ * pointer to a null pointer.
+ */
+template <typename T>
+void vector_destructor(vector<T>& v) {
+    for (auto&& i: v) {
+        delete i;
+        i = nullptr;
+    }
+}
 
 
 #endif

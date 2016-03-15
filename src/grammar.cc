@@ -1,16 +1,7 @@
 #include <algorithm>
 
 #include "grammar.h"
-
-
-template <typename T>
-static void vector_destructor(vector<T>& v) {
-    for (auto&& i: v) {
-        delete i;
-        i = nullptr;
-    }
-    v.clear();
-}
+#include "utilities.h"
 
 
 Term::~Term() {
@@ -22,7 +13,15 @@ Expression::~Expression() {
 }
 
 ExprList::~ExprList() {
-    vector_destructor(exprs);
+    // Cannot use default destructor because of different classes
+    for (auto&& i: exprs) {
+        if (i->str)
+            delete static_cast<String*>(i);
+        else
+            delete static_cast<Expression*>(i);
+
+        i = nullptr;
+    }
 }
 
 Factor::~Factor() {

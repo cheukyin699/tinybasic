@@ -7,11 +7,13 @@
 
 #include "tokenizer.h"
 #include "grammar.h"
+#include "interpreter.h"
 
 using namespace std;
 
 class Editor {
     private:
+        Interpreter inter;
         vector<string> buffer;          // Buffer of characters
         vector<Statement*> stmnts;      // Buffer of statements (lines)
         unsigned curr_line;

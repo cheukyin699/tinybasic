@@ -7,7 +7,6 @@ Parser::Parser(string l) {
 }
 
 Parser::~Parser() {
-    delete root;
     root = nullptr;
 }
 
@@ -143,7 +142,7 @@ Expression* Parser::getExpression() {
         getNextToken();
     }
     else {
-        ret->tks.push_back(NONE);
+        ret->tks.push_back(ADD);
     }
 
     // Check for the first term (must be present)

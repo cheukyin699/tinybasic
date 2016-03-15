@@ -23,11 +23,7 @@ class Factor;
  */
 class Statement {
 public:
-    Statement(): t(NONE) {}
     Statement(Token tk): t(tk) {}
-
-    template <typename T>
-    static void vector_destructor(vector<T>&);
 
     Token t;
 };
@@ -38,6 +34,10 @@ public:
  * consequentially derived from this one.
  */
 class StrExpr {
+protected:
+    StrExpr(bool s): str(s) {}
+public:
+    bool str;
 };
 
 /* The Term class.
@@ -65,7 +65,7 @@ public:
  */
 class Expression: public StrExpr {
 public:
-    Expression() {}
+    Expression(): StrExpr(false) {}
     ~Expression();
 
     vector<Term*> ts;
@@ -78,8 +78,8 @@ public:
  */
 class String: public StrExpr {
 public:
-    String(): s("") {}
-    String(string str): s(str) {}
+    String(): StrExpr(true), s("") {}
+    String(string str): StrExpr(true), s(str) {}
 
     string s;
 };
@@ -146,7 +146,7 @@ public:
  */
 class PrntStatement: public Statement {
 public:
-    PrntStatement(ExprList* l): l(l) {}
+    PrntStatement(ExprList* l): Statement(PRINT), l(l) {}
     ~PrntStatement();
 
     ExprList* l;
@@ -161,7 +161,7 @@ public:
  */
 class IfStatement: public Statement {
 public:
-    IfStatement(): e1(0), relop(NONE), e2(0), stmnt(0) {}
+    IfStatement(): Statement(IF), e1(0), relop(NONE), e2(0), stmnt(0) {}
     ~IfStatement();
 
     Expression* e1;
@@ -176,7 +176,9 @@ public:
  */
 class GotoStatement: public Statement {
 public:
-    GotoStatement(): expr(0) {}
+    GotoStatement(): Statement(GOTO), expr(0) {}
+    // For child only
+    GotoStatement(bool): Statement(GOSUB), expr(0) {}
     ~GotoStatement();
 
     Expression* expr;
@@ -189,7 +191,7 @@ public:
  */
 class InpStatement: public Statement {
 public:
-    InpStatement(): vl(0) {}
+    InpStatement(): Statement(INPUT), vl(0) {}
     ~InpStatement();
 
     VarList* vl;
@@ -204,7 +206,7 @@ public:
  */
 class LetStatement: public Statement {
 public:
-    LetStatement(): v(0), expr(0) {}
+    LetStatement(): Statement(LET), v(0), expr(0) {}
     ~LetStatement();
 
     Variable* v;
@@ -217,6 +219,8 @@ public:
  * thought it would be fitting to make it derived from the GotoStatement class.
  */
 class GSubStatement: public GotoStatement {
+public:
+    GSubStatement(): GotoStatement(true) {}
 };
 
 #endif
