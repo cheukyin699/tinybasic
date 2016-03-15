@@ -12,7 +12,12 @@
 Editor::Editor() {
     curr_line = 0;
     running = true;
+    changed = true;
     filename = "";
+}
+
+Editor::~Editor() {
+    Statement::vector_destructor(stmnts);
 }
 
 void Editor::handleInput(string line) {
@@ -120,11 +125,14 @@ void Editor::insertLine(string line) {
     }
     else
         buffer.insert(buffer.begin() + ++curr_line, line.substr(ind));
+
+    changed = true;
 }
 
 void Editor::removeLine(unsigned times) {
     unsigned erase_count = clamp<unsigned>(0, buffer.size(), curr_line + times);
     buffer.erase(buffer.begin() + curr_line, buffer.begin() + erase_count);
+    changed = true;
 }
 
 void Editor::write(string line) {
@@ -186,23 +194,36 @@ void Editor::load(string line) {
     }
 
     f.close();
+
+    changed = true;
 }
 
 void Editor::execute() {
-    // Tokenizer
-    unsigned errs = 0, i = 0;
-    vector<v_tokens> t_buff;
-    for (auto l: buffer) {
-        i++;
-        try {
-            Parser p(l);
-            p.generateTree();
-        } catch (runtime_error ex) {
-            cerr << "Line " << i << ":" << ex.what() << endl;
-            errs++;
+    if (changed) {
+        unsigned errs = 0, i = 0;
+        stmnts.clear();
+
+        // Parse everything
+        for (auto l: buffer) {
+            i++;
+            try {
+                Parser p(l);
+                p.generateTree();
+                stmnts.push_back(p.getTree());
+            } catch (runtime_error ex) {
+                cerr << "Line " << i << ":" << ex.what() << endl;
+                errs++;
+            }
         }
+        #ifdef DEBUG
+        cout << "Total of " << errs << " error(s) reported.\n";
+        #endif
     }
-    cout << "Total of " << errs << " error(s) reported.\n";
+
+    // Execute everything
+
+
+    changed = false;
 }
 
 void Editor::fileStats() {
@@ -225,4 +246,6 @@ void Editor::editLine(string line) {
         buffer.insert(buffer.begin() + curr_line, line);
     }
     curr_line++;
+
+    changed = true;
 }

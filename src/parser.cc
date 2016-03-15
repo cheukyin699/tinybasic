@@ -27,6 +27,10 @@ void Parser::generateTree() {
         throw runtime_error("could not reach end of statement - did not consume everything");
 }
 
+Statement* Parser::getTree() {
+    return root;
+}
+
 Statement* Parser::getStatement() {
     token_t stmnt_head = *it;
     getNextToken();

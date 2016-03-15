@@ -6,15 +6,17 @@
 #include <vector>
 
 #include "tokenizer.h"
+#include "grammar.h"
 
 using namespace std;
 
 class Editor {
     private:
         vector<string> buffer;          // Buffer of characters
+        vector<Statement*> stmnts;      // Buffer of statements (lines)
         unsigned curr_line;
         string filename;
-        bool running;
+        bool running, changed;
 
         void printLine(unsigned);
         void navLine(int);
@@ -25,6 +27,7 @@ class Editor {
 
     public:
         Editor();
+        ~Editor();
 
         void handleInput(string);
         void write(string);

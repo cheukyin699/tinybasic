@@ -29,6 +29,7 @@ public:
     ~Parser();
 
     void generateTree();
+    Statement* getTree();
 };
 
 #endif
