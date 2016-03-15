@@ -17,7 +17,6 @@ Editor::Editor() {
 }
 
 Editor::~Editor() {
-    Statement::vector_destructor(stmnts);
 }
 
 void Editor::handleInput(string line) {
@@ -199,8 +198,8 @@ void Editor::load(string line) {
 }
 
 void Editor::execute() {
+    unsigned errs = 0, i = 0;
     if (changed) {
-        unsigned errs = 0, i = 0;
         stmnts.clear();
 
         // Parse everything
@@ -240,10 +239,14 @@ void Editor::help() {
 }
 
 void Editor::editLine(string line) {
+    // Skip all the spaces
+    unsigned ind = nextToken(line, 1);
+    // Automagically converts to ALL CAPS
+    transform(line.begin(), line.end(), line.begin(), ::toupper);
     try {
-        buffer.at(curr_line) = line;
+        buffer.at(curr_line) = line.substr(ind);
     } catch (exception ex) {
-        buffer.insert(buffer.begin() + curr_line, line);
+        buffer.insert(buffer.begin() + curr_line, line.substr(ind));
     }
     curr_line++;
 
