@@ -12,7 +12,8 @@ private:
     v_tokens::iterator it;
     Statement* root;
 
-    token_t getNextToken();
+    void getNextToken();
+    inline void assertSanity(string);
 
     Statement*      getStatement();
     Expression*     getExpression();

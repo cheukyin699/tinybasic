@@ -33,13 +33,10 @@ struct token_t {
     Token t;
     int num;        // The type of variable is stored here [0,25]
     string str;
+    token_t(Token t=NONE, int num=0, string str=""): t(t), num(num), str(str) {}
 };
 
 typedef vector<token_t> v_tokens;
-
-/* Creates a new token from scratch
- */
-token_t create_token(Token tt=NONE, int n=0, string s="");
 
 /* Creates a new token with the defaults from one that has just been initialized
  */
@@ -51,7 +48,7 @@ v_tokens get_tokens(string line);
 
 /* Checks to see if the given string is a token. If it is, it returns that
  * token. If it isn't, it gives a token with NONE as the type. It returns a
- * the length of the token, or -1 if the whole length is used.
+ * the length of the token, or 0 if the whole length is used.
  */
 unsigned is_token(string, token_t&);
 

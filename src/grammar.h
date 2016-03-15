@@ -1,6 +1,7 @@
 #ifndef GRAMMAR_H
 #define GRAMMAR_H
 
+#include <string>
 #include <vector>
 
 #include "tokenizer.h"
@@ -11,7 +12,7 @@ using namespace std;
 /* The type that a factor contains. Makes it slightly easier to check what the
  * factor contains.
  */
-enum FType {Var, Num, Exp};
+enum FType {None, Var, Num, Exp};
 
 class Factor;
 
@@ -22,6 +23,12 @@ class Factor;
  */
 class Statement {
 public:
+    Statement(): t(NONE) {}
+    Statement(Token tk): t(tk) {}
+
+    template <typename T>
+    static void vector_destructor(vector<T>&);
+
     Token t;
 };
 
@@ -42,6 +49,9 @@ class StrExpr {
  */
 class Term {
 public:
+    Term() {}
+    ~Term();
+
     vector<Factor*> fs;
     vector<Token> tks;
 };
@@ -55,6 +65,9 @@ public:
  */
 class Expression: public StrExpr {
 public:
+    Expression() {}
+    ~Expression();
+
     vector<Term*> ts;
     vector<Token> tks;
 };
@@ -65,6 +78,9 @@ public:
  */
 class String: public StrExpr {
 public:
+    String(): s("") {}
+    String(string str): s(str) {}
+
     string s;
 };
 
@@ -75,6 +91,9 @@ public:
  */
 class ExprList {
 public:
+    ExprList() {}
+    ~ExprList();
+
     vector<StrExpr*> exprs;
 };
 
@@ -84,6 +103,9 @@ public:
  */
 class Variable {
 public:
+    Variable(): v(0) {}
+    Variable(char c): v(c) {}
+
     char v;
 };
 
@@ -96,6 +118,9 @@ public:
  */
 class Factor {
 public:
+    Factor(): t(None), v(0), n(0), expr(0) {}
+    ~Factor();
+
     FType t;
     Variable* v;
     int n;
@@ -108,6 +133,9 @@ public:
  */
 class VarList {
 public:
+    VarList() {}
+    ~VarList();
+
     vector<Variable*> vars;
 };
 
@@ -118,6 +146,9 @@ public:
  */
 class PrntStatement: public Statement {
 public:
+    PrntStatement(ExprList* l): l(l) {}
+    ~PrntStatement();
+
     ExprList* l;
 };
 
@@ -130,6 +161,9 @@ public:
  */
 class IfStatement: public Statement {
 public:
+    IfStatement(): e1(0), relop(NONE), e2(0), stmnt(0) {}
+    ~IfStatement();
+
     Expression* e1;
     Token relop;
     Expression* e2;
@@ -142,6 +176,9 @@ public:
  */
 class GotoStatement: public Statement {
 public:
+    GotoStatement(): expr(0) {}
+    ~GotoStatement();
+
     Expression* expr;
 };
 
@@ -152,6 +189,9 @@ public:
  */
 class InpStatement: public Statement {
 public:
+    InpStatement(): vl(0) {}
+    ~InpStatement();
+
     VarList* vl;
 };
 
@@ -164,6 +204,9 @@ public:
  */
 class LetStatement: public Statement {
 public:
+    LetStatement(): v(0), expr(0) {}
+    ~LetStatement();
+
     Variable* v;
     Expression* expr;
 };

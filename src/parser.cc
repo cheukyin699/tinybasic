@@ -3,13 +3,21 @@
 Parser::Parser(string l) {
     tks = get_tokens(l);
     it = tks.begin();
+    root = nullptr;
 }
 
 Parser::~Parser() {
+    delete root;
+    root = nullptr;
 }
 
-token_t Parser::getNextToken() {
-    return *(it++);
+void Parser::getNextToken() {
+    it++;
+}
+
+inline void Parser::assertSanity(string msg) {
+    if (it == tks.end())
+        throw runtime_error(msg);
 }
 
 void Parser::generateTree() {
@@ -20,63 +28,62 @@ void Parser::generateTree() {
 }
 
 Statement* Parser::getStatement() {
-    token_t stmnt_head = getNextToken();
+    token_t stmnt_head = *it;
+    getNextToken();
 
     switch (stmnt_head.t) {
-        case Token::PRINT:
+        case PRINT:
         {
             // Consumes an expression/string and an expression/string list
             // Only shows expression because the string could be found from it
-            PrntStatement* s = new PrntStatement();
-            s->l = getExprList();
+            PrntStatement* s = new PrntStatement(getExprList());
             return s;
         }
-        case Token::IF:
+        case IF:
         {
             IfStatement* s = new IfStatement();
             s->e1 = getExpression();
             s->relop = getRelop();
             s->e2 = getExpression();
-            if (getNextToken().t != Token::THEN)
+            if ((it++)->t != THEN)
                 throw runtime_error("expected THEN after second expression");
             s->stmnt = getStatement();
             return s;
         }
-        case Token::GOTO:
+        case GOTO:
         {
             GotoStatement* s = new GotoStatement();
             s->expr = getExpression();
             return s;
         }
-        case Token::INPUT:
+        case INPUT:
         {
             InpStatement* s = new InpStatement();
             s->vl = getVarList();
             return s;
         }
-        case Token::LET:
+        case LET:
         {
             LetStatement* s = new LetStatement();
             s->v = getVar();
-            if (getNextToken().t != Token::EQ)
+            if ((it++)->t != EQ)
                 throw runtime_error("expected '=' after variable");
             s->expr = getExpression();
             return s;
         }
-        case Token::GOSUB:
+        case GOSUB:
         {
             GSubStatement* s = new GSubStatement();
             s->expr = getExpression();
             return s;
         }
-        case Token::RETURN:
-        case Token::CLEAR:
-        case Token::LIST:
-        case Token::RUN:
-        case Token::END:
+        case RETURN:
+        case CLEAR:
+        case LIST:
+        case RUN:
+        case END:
         {
-            Statement* s = new Statement();
-            s->t = stmnt_head.t;
+            Statement* s = new Statement(stmnt_head.t);
             return s;
         }
         default:
@@ -87,9 +94,10 @@ Statement* Parser::getStatement() {
 ExprList* Parser::getExprList() {
     ExprList* ret = new ExprList();
 
-    if (it->t == Token::STRING) {
-        String* s = new String();
-        s->s = it->str;
+    assertSanity("expected an expression/string");
+
+    if (it->t == STRING) {
+        String* s = new String(it->str);
         ret->exprs.push_back(s);
 
         getNextToken();
@@ -98,16 +106,15 @@ ExprList* Parser::getExprList() {
         ret->exprs.push_back(getExpression());
     }
 
-    while (it->t == Token::COMMA) {
+    while (it != tks.end() && it->t == COMMA) {
         getNextToken();
 
         // Sanity checking - if the next token is the end of the line
-        if (it == tks.end() || it->t == Token::COMMA)
+        if (it == tks.end() || it->t == COMMA)
             throw runtime_error("expected an expression/string after comma");
 
-        if (it->t == Token::STRING) {
-            String* s = new String();
-            s->s = it->str;
+        if (it->t == STRING) {
+            String* s = new String(it->str);
             ret->exprs.push_back(s);
 
             getNextToken();
@@ -122,21 +129,24 @@ ExprList* Parser::getExprList() {
 
 Expression* Parser::getExpression() {
     Expression* ret = new Expression();
+
+    assertSanity("expected a term");
+
     // Check if the first token is a binop or not, and add the correct token to
     // the first slot.
-    if (it->t == Token::ADD || it->t == Token::SUB) {
+    if (it->t == ADD || it->t == SUB) {
         ret->tks.push_back(it->t);
         getNextToken();
     }
     else {
-        ret->tks.push_back(Token::NONE);
+        ret->tks.push_back(NONE);
     }
 
     // Check for the first term (must be present)
     ret->ts.push_back(getTerm());
 
     // The next n terms (and tokens) are all optional
-    while (it->t == Token::ADD || it->t == Token::SUB) {
+    while (it != tks.end() && (it->t == ADD || it->t == SUB)) {
         // Insert
         ret->tks.push_back(it->t);
         // Consume
@@ -155,7 +165,7 @@ Term* Parser::getTerm() {
     ret->fs.push_back(getFactor());
 
     // The next n factors (and tokens) are all optional
-    while (it->t == Token::MUL || it->t == Token::DIV) {
+    while (it != tks.end() && (it->t == MUL || it->t == DIV)) {
         // Insert
         ret->tks.push_back(it->t);
         // Consume
@@ -168,14 +178,16 @@ Term* Parser::getTerm() {
 }
 
 Factor* Parser::getFactor() {
+    assertSanity("expected a factor");
+
     Factor* ret = new Factor();
 
     switch (it->t) {
-    case Token::VARIABLE:
+    case VARIABLE:
         ret->t = FType::Var;
         ret->v = getVar();
         break;
-    case Token::NUMBER:
+    case NUMBER:
         ret->t = FType::Num;
         ret->n = it->num;
         // Consume number
@@ -196,11 +208,11 @@ VarList* Parser::getVarList() {
 
     ret->vars.push_back(getVar());
 
-    while (it->t == Token::COMMA) {
+    while (it != tks.end() && it->t == COMMA) {
         getNextToken();
 
         // Sanity checking
-        if (it == tks.end() || it->t == Token::COMMA)
+        if (it == tks.end() || it->t == COMMA)
             throw runtime_error("expected a variable after the comma");
 
         ret->vars.push_back(getVar());
@@ -210,14 +222,12 @@ VarList* Parser::getVarList() {
 }
 
 Variable* Parser::getVar() {
-    // Sanity checking
-    if (it == tks.end())
-        throw runtime_error("expected a variable");
+    assertSanity("expected a variable");
 
     Variable* ret = new Variable();
 
     if (isalpha(it->str[0])) {
-        ret->v = it->num;
+        ret->v = it->str[0];
         getNextToken();
     }
     else {
@@ -228,19 +238,17 @@ Variable* Parser::getVar() {
 }
 
 Token Parser::getRelop() {
-    // Sanity checking
-    if (it == tks.end())
-        throw runtime_error("expected a binary operator");
+    assertSanity("expected a binary operator");
 
     Token ret;
 
     switch (it->t) {
-        case Token::EQ:
-        case Token::NEQ:
-        case Token::LT:
-        case Token::LTE:
-        case Token::GT:
-        case Token::GTE:
+        case EQ:
+        case NEQ:
+        case LT:
+        case LTE:
+        case GT:
+        case GTE:
             ret = it->t;
             // Consume
             getNextToken();

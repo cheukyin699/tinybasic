@@ -6,15 +6,6 @@
 
 using namespace std;
 
-token_t create_token(Token tt, int n, string s) {
-    token_t t;
-    t.t = tt;
-    t.num = n;
-    t.str = s;
-
-    return t;
-}
-
 void reset_token(token_t& t) {
     t.t = NONE;
     t.num = 0;

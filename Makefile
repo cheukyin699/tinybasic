@@ -4,7 +4,7 @@ LD := g++
 LDFLAGS := 
 
 EXE := tbasic
-OBJ = obj/editor.o obj/main.o obj/utilities.o obj/tokenizer.o obj/parser.o
+OBJ = obj/editor.o obj/main.o obj/utilities.o obj/tokenizer.o obj/parser.o obj/grammar.o
 TESTS := test_tokenizer
 
 .PHONY: all clean tests
