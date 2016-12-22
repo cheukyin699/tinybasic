@@ -67,9 +67,11 @@ void Editor::handleInput(string line) {
             return;
         case 'T':                           // Move to very top
             curr_line = 0;
+            printLine(curr_line);
             return;
         case 'B':                           // Move to very bottom
             curr_line = buffer.size() - 1;
+            printLine(curr_line);
             return;
         case 'W':                           // Write to file
             write(line);
