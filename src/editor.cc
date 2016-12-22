@@ -93,7 +93,11 @@ void Editor::handleInput(string line) {
 }
 
 void Editor::printLine(unsigned i) {
-    printf("%04u %s\n", i, buffer[i].c_str());
+    try {
+        printf("%04u %s\n", i, buffer.at(i).c_str());
+    } catch (exception ex) {
+        cout << "Blank line!" << endl;
+    }
 }
 
 void Editor::navLine(int lines) {
