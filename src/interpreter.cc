@@ -108,8 +108,8 @@ void Interpreter::xIf(IfStatement* s) {
 }
 
 void Interpreter::xGoto(GotoStatement* s) {
-    int line = evalExp(s->expr);
-    xStatement(stmnts.at(line));
+    curr_line = evalExp(s->expr);
+    xStatement(stmnts.at(curr_line));
 }
 
 void Interpreter::xInp(InpStatement* s) {
