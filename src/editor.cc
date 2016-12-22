@@ -158,6 +158,7 @@ void Editor::write(string line) {
             lines++;
         }
         cout << lines << " lines written successfully to '" << fn << "'" << endl;
+        filename = fn;
     } else {
         cout << "Couldn't open file '" << fn << "' for writing" << endl;
     }
