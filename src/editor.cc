@@ -136,7 +136,8 @@ void Editor::insertLine(string line) {
 
 void Editor::removeLine(unsigned times) {
     unsigned erase_count = clamp<unsigned>(0, buffer.size(), curr_line + times);
-    buffer.erase(buffer.begin() + curr_line, buffer.begin() + erase_count);
+    buffer.erase(buffer.begin() + curr_line,
+                 buffer.begin() + curr_line + erase_count);
     changed = true;
 }
 
