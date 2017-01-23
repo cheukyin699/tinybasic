@@ -3,7 +3,7 @@
 
 #include "editor.h"
 
-#define VERSION         "v0.0.0"
+#define VERSION         "v1.0.0"
 
 const string Prompt = ">> ";
 
