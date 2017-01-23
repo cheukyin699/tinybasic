@@ -1,0 +1,4 @@
+LET I = 0
+PRINT I * I
+LET I = I + 1
+IF I < 10 THEN GOTO 1
